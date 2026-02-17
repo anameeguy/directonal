@@ -1,0 +1,14 @@
+[package]
+name = "directonal"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+serde = ["dep:serde"]
+bevy = ["dep:bevy"]
+all = ["serde", "bevy"]
+# default = ["all"]
+
+[dependencies]
+serde = { optional = true, version = "1.0.228" }
+bevy = { optional = true, version = "0.18.0" }

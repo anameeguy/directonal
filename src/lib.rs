@@ -1,0 +1,124 @@
+#[cfg(feature = "bevy")]
+pub const DIRECTIONAL_VEC2S: Directional<bevy::math::Vec2> = Directional::new(
+    bevy::math::Vec2::X,
+    bevy::math::Vec2::NEG_X,
+    bevy::math::Vec2::Y,
+    bevy::math::Vec2::NEG_Y,
+);
+pub const DIRECTIONAL_DIRS: Directional<Direction> = Directional::new(
+    Direction::Right,
+    Direction::Left,
+    Direction::Up,
+    Direction::Down,
+);
+pub const ALL_DIRS: [Direction; 4] = [
+    Direction::Right,
+    Direction::Left,
+    Direction::Up,
+    Direction::Down,
+];
+
+#[cfg_attr(feature = "bevy", derive(bevy::reflect::Reflect))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Clone, Copy)]
+pub struct Directional<T> {
+    pub right: T,
+    pub left: T,
+    pub up: T,
+    pub down: T,
+}
+
+impl<T> Directional<T> {
+    pub const fn new(right: T, left: T, up: T, down: T) -> Directional<T> {
+        Directional {
+            right,
+            left,
+            up,
+            down,
+        }
+    }
+
+    pub fn from_dir(&self, dir: Direction) -> &T {
+        if dir == Direction::Right {
+            &self.right
+        } else if dir == Direction::Left {
+            &self.left
+        } else if dir == Direction::Up {
+            &self.up
+        } else {
+            &self.down
+        }
+    }
+
+    pub fn mut_from_dir(&mut self, dir: Direction) -> &mut T {
+        if dir == Direction::Right {
+            &mut self.right
+        } else if dir == Direction::Left {
+            &mut self.left
+        } else if dir == Direction::Up {
+            &mut self.up
+        } else {
+            &mut self.down
+        }
+    }
+}
+
+impl<T: Clone> Directional<T> {
+    pub fn new_all(all: T) -> Directional<T> {
+        Directional {
+            right: all.clone(),
+            left: all.clone(),
+            up: all.clone(),
+            down: all,
+        }
+    }
+
+    pub fn iter(&self) -> [T; 4] {
+        let selfin = self.clone();
+        [selfin.right, selfin.left, selfin.up, selfin.down]
+    }
+}
+
+#[cfg_attr(feature = "bevy", derive(bevy::reflect::Reflect))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum Direction {
+    Right,
+    Left,
+    Up,
+    Down,
+}
+
+impl Direction {
+    pub fn is_vertical(&self) -> bool {
+        *self == Direction::Up || *self == Direction::Down
+    }
+
+    pub fn is_horizontal(&self) -> bool {
+        *self == Direction::Right || *self == Direction::Left
+    }
+
+    pub fn opposite(&self) -> Direction {
+        let mut response = Direction::Up;
+        let oppo_dirs = Directional::new(
+            Direction::Left,
+            Direction::Right,
+            Direction::Down,
+            Direction::Up,
+        );
+
+        for dir in DIRECTIONAL_DIRS.iter() {
+            if *self == dir {
+                response = *oppo_dirs.from_dir(dir);
+                break;
+            }
+        }
+
+        response
+    }
+
+    #[cfg(feature = "bevy")]
+    pub fn get_vec2(&self) -> &bevy::math::Vec2 {
+        DIRECTIONAL_VEC2S.from_dir(*self)
+    }
+}
