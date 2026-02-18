@@ -117,6 +117,19 @@ impl Direction {
         response
     }
 
+    pub fn rotated_90_clockwise(&self) -> Self {
+        match self {
+            Self::Right => Self::Down,
+            Self::Left => Self::Up,
+            Self::Up => Self::Right,
+            Self::Down => Self::Left,
+        }
+    }
+
+    pub fn rotated_90_anticlockwise(&self) -> Self {
+        self.rotated_90_clockwise().opposite()
+    }
+
     #[cfg(feature = "bevy")]
     pub fn get_vec2(&self) -> &bevy::math::Vec2 {
         DIRECTIONAL_VEC2S.from_dir(*self)
