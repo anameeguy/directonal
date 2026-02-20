@@ -20,7 +20,7 @@ pub const ALL_DIRS: [Direction; 4] = [
 
 #[cfg_attr(feature = "bevy", derive(bevy::reflect::Reflect))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default, Hash)]
 pub struct Directional<T> {
     pub right: T,
     pub left: T,
