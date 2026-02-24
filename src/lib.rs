@@ -137,9 +137,9 @@ impl Direction {
             Direction::Up,
         );
 
-        for dir in DIRECTIONAL_DIRS.iter() {
+        for dir in DIRECTIONAL_DIRS {
             if *self == dir {
-                response = *oppo_dirs.from_dir(dir);
+                response = oppo_dirs[dir];
                 break;
             }
         }
