@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 #[cfg(feature = "bevy")]
 pub const DIRECTIONAL_VEC2S: Directional<bevy::math::Vec2> = Directional::new(
     bevy::math::Vec2::X,
@@ -37,30 +39,6 @@ impl<T> Directional<T> {
             down,
         }
     }
-
-    pub fn from_dir(&self, dir: Direction) -> &T {
-        if dir == Direction::Right {
-            &self.right
-        } else if dir == Direction::Left {
-            &self.left
-        } else if dir == Direction::Up {
-            &self.up
-        } else {
-            &self.down
-        }
-    }
-
-    pub fn mut_from_dir(&mut self, dir: Direction) -> &mut T {
-        if dir == Direction::Right {
-            &mut self.right
-        } else if dir == Direction::Left {
-            &mut self.left
-        } else if dir == Direction::Up {
-            &mut self.up
-        } else {
-            &mut self.down
-        }
-    }
 }
 
 impl<T: Clone> Directional<T> {
@@ -72,10 +50,62 @@ impl<T: Clone> Directional<T> {
             down: all,
         }
     }
+}
 
-    pub fn iter(&self) -> [T; 4] {
-        let selfin = self.clone();
-        [selfin.right, selfin.left, selfin.up, selfin.down]
+impl<T> Index<Direction> for Directional<T> {
+    type Output = T;
+
+    fn index(&self, dir: Direction) -> &Self::Output {
+        match dir {
+            Direction::Right => &self.right,
+            Direction::Left => &self.left,
+            Direction::Up => &self.up,
+            Direction::Down => &self.down,
+        }
+    }
+}
+
+impl<T> IndexMut<Direction> for Directional<T> {
+    fn index_mut(&mut self, dir: Direction) -> &mut Self::Output {
+        match dir {
+            Direction::Right => &mut self.right,
+            Direction::Left => &mut self.left,
+            Direction::Up => &mut self.up,
+            Direction::Down => &mut self.down,
+        }
+    }
+}
+
+impl<T> IntoIterator for Directional<T> {
+    type Item = T;
+    type IntoIter = std::array::IntoIter<T, 4>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [self.right, self.left, self.up, self.down].into_iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a Directional<T> {
+    type Item = &'a T;
+    type IntoIter = std::array::IntoIter<&'a T, 4>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [&self.right, &self.left, &self.up, &self.down].into_iter()
+    }
+}
+
+impl<'a, T> IntoIterator for &'a mut Directional<T> {
+    type Item = &'a mut T;
+    type IntoIter = std::array::IntoIter<&'a mut T, 4>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        [
+            &mut self.right,
+            &mut self.left,
+            &mut self.up,
+            &mut self.down,
+        ]
+        .into_iter()
     }
 }
 
