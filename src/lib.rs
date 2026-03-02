@@ -1,18 +1,18 @@
 use std::ops::{Index, IndexMut};
 
 #[cfg(feature = "bevy")]
-pub const DIRECTIONAL_VEC2S: Directional<bevy::math::Vec2> = Directional::new(
-    bevy::math::Vec2::X,
-    bevy::math::Vec2::NEG_X,
-    bevy::math::Vec2::Y,
-    bevy::math::Vec2::NEG_Y,
-);
-pub const DIRECTIONAL_DIRS: Directional<Direction> = Directional::new(
-    Direction::Right,
-    Direction::Left,
-    Direction::Up,
-    Direction::Down,
-);
+pub const DIRECTIONAL_VEC2S: Directional<bevy::math::Vec2> = Directional {
+    right: bevy::math::Vec2::X,
+    left: bevy::math::Vec2::NEG_X,
+    up: bevy::math::Vec2::Y,
+    down: bevy::math::Vec2::NEG_Y,
+};
+pub const DIRECTIONAL_DIRS: Directional<Direction> = Directional {
+    right: Direction::Right,
+    left: Direction::Left,
+    up: Direction::Up,
+    down: Direction::Down,
+};
 pub const ALL_DIRS: [Direction; 4] = [
     Direction::Right,
     Direction::Left,
@@ -31,8 +31,28 @@ pub struct Directional<T> {
 }
 
 impl<T> Directional<T> {
-    pub const fn new(right: T, left: T, up: T, down: T) -> Directional<T> {
-        Directional {
+    pub fn new<B>(input: B) -> Directional<T>
+    where
+        Directional<T>: From<B>,
+    {
+        Directional::from(input)
+    }
+}
+
+impl<T: Clone> From<T> for Directional<T> {
+    fn from(value: T) -> Self {
+        Self {
+            right: value.clone(),
+            left: value.clone(),
+            up: value.clone(),
+            down: value,
+        }
+    }
+}
+
+impl<T> From<[T; 4]> for Directional<T> {
+    fn from([right, left, up, down]: [T; 4]) -> Self {
+        Self {
             right,
             left,
             up,
@@ -41,16 +61,50 @@ impl<T> Directional<T> {
     }
 }
 
-impl<T: Clone> Directional<T> {
-    pub fn new_all(all: T) -> Directional<T> {
-        Directional {
-            right: all.clone(),
-            left: all.clone(),
-            up: all.clone(),
-            down: all,
+impl<T> From<(T, T, T, T)> for Directional<T> {
+    fn from((right, left, up, down): (T, T, T, T)) -> Self {
+        Self {
+            right,
+            left,
+            up,
+            down,
         }
     }
 }
+
+// trait DirectionalGenerator {
+//     type Item;
+
+//     fn do_da_ting(self) -> Directional<Self::Item>;
+// }
+
+// impl<T: Clone> DirectionalGenerator for T {
+//     type Item = T;
+
+//     fn do_da_ting(self) -> Directional<T> {
+//         Directional {
+//             right: self.clone(),
+//             left: self.clone(),
+//             up: self.clone(),
+//             down: self,
+//         }
+//     }
+// }
+
+// impl<T> DirectionalGenerator for [T; 4] {
+//     type Item = T;
+
+//     fn do_da_ting(self) -> Directional<T> {
+//         let [right, left, up, down] = self;
+
+//         Directional {
+//             right,
+//             left,
+//             up,
+//             down,
+//         }
+//     }
+// }
 
 impl<T> Index<Direction> for Directional<T> {
     type Output = T;
@@ -130,12 +184,12 @@ impl Direction {
 
     pub fn opposite(&self) -> Direction {
         let mut response = Direction::Up;
-        let oppo_dirs = Directional::new(
-            Direction::Left,
-            Direction::Right,
-            Direction::Down,
-            Direction::Up,
-        );
+        let oppo_dirs = Directional {
+            right: Direction::Left,
+            left: Direction::Right,
+            up: Direction::Down,
+            down: Direction::Up,
+        };
 
         for dir in DIRECTIONAL_DIRS {
             if *self == dir {
