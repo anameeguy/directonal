@@ -162,6 +162,6 @@ impl Direction {
 
     #[cfg(feature = "bevy")]
     pub fn get_vec2(&self) -> &bevy::math::Vec2 {
-        DIRECTIONAL_VEC2S.from_dir(*self)
+        &DIRECTIONAL_VEC2S[*self]
     }
 }
